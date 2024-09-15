@@ -1,23 +1,29 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 )
 
-type apiHandler struct{}
-
-func (apiHandler) ServeHTTP(http.ResponseWriter, *http.Request) {}
-
 func main() {
+	const filepathRoot = "."
+	const port = "8080"
+
 	mux := http.NewServeMux()
-	server := &http.Server{
-		Addr:    ":8080", // Set the server address
-		Handler: mux,     // Use the ServeMux as the handler
+	mux.Handle("/app/", http.StripPrefix("/app", http.FileServer(http.Dir(filepathRoot))))
+	mux.HandleFunc("/healthz", handlerReadiness)
+
+	srv := &http.Server{
+		Addr:    ":" + port,
+		Handler: mux,
 	}
 
-	err := server.ListenAndServe()
-	if err != nil {
-		fmt.Println("Error starting server:", err)
-	}
+	log.Printf("Serving files from %s on port: %s\n", filepathRoot, port)
+	log.Fatal(srv.ListenAndServe())
+}
+
+func handlerReadiness(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "text/plain; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(http.StatusText(http.StatusOK)))
 }
