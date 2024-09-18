@@ -3,9 +3,10 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"net/http"
+
 	"github.com/m1kecv/goserv/internal/auth"
 	"github.com/m1kecv/goserv/internal/database"
-	"net/http"
 )
 
 type User struct {

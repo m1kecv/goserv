@@ -26,3 +26,4 @@ go.work.sum
 
 out
 database.json
+.env
